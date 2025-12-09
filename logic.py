@@ -1,6 +1,7 @@
 from random import randint
+import random
 import requests
-
+classes=["class1", "class2"]
 class Pokemon:
     pokemons = {}
     # Инициализация объекта (конструктор)
@@ -11,6 +12,9 @@ class Pokemon:
         self.pokemon_number = randint(1,1000)
         self.img = self.get_img()
         self.name = self.get_name()
+        self.hp=randint(100, 150)
+        self.power=randint(30, 40)
+        self.cl=random.choice(classes)
 
         Pokemon.pokemons[pokemon_trainer] = self
 
@@ -23,6 +27,7 @@ class Pokemon:
             return (data['sprites']['other']['home']['front_default'])
         else:
             return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/179.png"
+    
     # Метод для получения имени покемона через API
     def get_name(self):
         url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
@@ -36,11 +41,46 @@ class Pokemon:
 
     # Метод класса для получения информации
     def info(self):
-        return f"Имя твоего покеомона: {self.name}"
+        return f"Имя твоего покеомона: {self.name}, {self.cl}, здоровье - {self.hp}, сила - {self.power}"
 
     # Метод класса для получения картинки покемона
     def show_img(self):
         return self.img
+
+    def attack(self, enemy):
+        if isinstance(enemy, Wizard): # Проверка на то, что enemy является типом данных Wizard (является экземпляром класса Волшебник)
+            chance = randint(1,5)
+            if chance == 1:
+                return "Покемон-волшебник применил щит в сражении"
+        if enemy.hp > self.power:
+            enemy.hp -= self.power
+            return f"Сражение @{self.pokemon_trainer} с @{enemy.pokemon_trainer}"
+        else:
+            enemy.hp = 0
+            return f"Победа @{self.pokemon_trainer} над @{enemy.pokemon_trainer}! "
+
+
+
+class Wizard(Pokemon):
+    pass 
+
+class Fighter(Pokemon):
+    def attack(self, enemy):
+        super_power = randint(5,15)
+        self.power += super_power
+        res = super().attack(enemy)
+        self.power -= super_power
+        return res + f"\nБоец применил супер-атаку силой:{super_power} "
+    
+if __name__ == '__main__':
+    wizard = Wizard("username1")
+    fighter = Fighter("username2")
+
+    print(wizard.info())
+    print()
+    print(fighter.info())
+    print()
+    print(fighter.attack(wizard))
 
 
 
